@@ -158,4 +158,59 @@ mod tests {
         assert_eq!(scan_indents(&d), [0, 1, 1, 1, 3, 3, 2, 5, 0]);
         assert_eq!(scan_indents(&d).capacity(), 9);
     }
+
+    #[test]
+    fn transpile() {
+        use super::transpile;
+
+        assert_eq!(transpile(&["# section: Foo bar"], false),
+            "\\section{Foo bar}\n");
+        assert_eq!(transpile(&["# section: Foo: bar"], false),
+            "\\section{Foo: bar}\n");
+        assert_eq!(transpile(&["# section [Foo bar]: Foo bar"], false),
+            "\\section[Foo bar]{Foo bar}\n");
+        assert_eq!(transpile(&["# section [Foo\\: bar]: Foo: bar"], false),
+            "\\section[Foo: bar]{Foo: bar}\n");
+
+        /*let buf = ["This should be converted:",
+                   "# section: Foo bar",
+                   "# section: Foo: bar",
+                   "# section [Foo bar]: Foo bar",
+                   "# section [Foo\\: bar]: Foo: bar",
+                   "",
+                   "# section* : spam eggs",
+                   "",
+                   "Comments should be handled correctly:",
+                   "# section: foo bar % test",
+                   "# section: \\% baz % test",
+                   "# sec%tion: foo bar",
+                   "# section % baz: foo bar",
+                   "",
+                   "This should not be converted:",
+                   "# section",
+                   "#section: Foo"];
+
+        let expected_result = "This should be converted:
+                               \\section{Foo bar}
+                               \\section{Foo: bar}
+                               \\section[Foo bar]{Foo bar}
+                               \\section[Foo: bar]{Foo: bar}
+
+                            \\section*{spam eggs}
+
+                            Comments should be handled correctly:
+                            \\section{foo bar} % test
+                            \\section{\\% baz} % test
+                            # sec%tion: foo bar
+                            # section % baz: foo bar
+
+                            This should not be converted:
+                            # section
+                            #section: Foo
+                            ";
+
+        let result = transpile(&buf, false);
+
+        assert_eq!(result, expected_result);*/
+    }
 }
