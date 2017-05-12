@@ -389,4 +389,17 @@ mod tests {
 
         assert_eq!(args_parser(&b"%E"[..]), Error(error_position!(ErrorKind::Alt, &b"%E"[..])));
     }
+
+    #[test]
+    fn hashline_parser() {
+        use super::hashline_parser;
+        use super::Hashline;
+
+        assert_eq!(hashline_parser(b"# section: Test"),
+            Done(&b""[..], Hashline::PlainLine(String::from(r"\section{Test}"))));
+        assert_eq!(hashline_parser(b"# section [foo]: Test"),
+            Done(&b""[..], Hashline::PlainLine(String::from(r"\section[foo]{Test}"))));
+        assert_eq!(hashline_parser(b"# section: Test %comment"),
+            Done(&b""[..], Hashline::PlainLine(String::from(r"\section{Test} %comment"))));
+    }
 }

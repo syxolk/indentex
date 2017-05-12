@@ -61,6 +61,9 @@ mod tests {
 
         let b = &b"cde"[..];
         assert_eq!(f(b), Done(&b"de"[..], 'c' as u8));
+
+        let c = &b""[..];
+        assert_eq!(f(c), nom::IResult::Incomplete::<_, _>(nom::Needed::Size(1)));
     }
 
     #[test]
@@ -72,5 +75,8 @@ mod tests {
 
         let b = &b"cde"[..];
         assert_eq!(f(b), Done(&b"de"[..], 'c' as u8));
+
+        let c = &b""[..];
+        assert_eq!(f(c), nom::IResult::Incomplete::<_, _>(nom::Needed::Size(1)));
     }
 }

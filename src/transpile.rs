@@ -187,10 +187,14 @@ mod tests {
         assert_eq!(transpile(&["# section % baz: foo bar"], false),
             "# section % baz: foo bar\n");
 
-        // Errors
+        // Do not convert
         assert_eq!(transpile(&["# section"], false),
             "# section\n");
         assert_eq!(transpile(&["#section: Foo"], false),
             "#section: Foo\n");
+        assert_eq!(transpile(&["\\# section"], false),
+            "\\# section\n");
+        assert_eq!(transpile(&["%# section"], false),
+            "%# section\n");
     }
 }
