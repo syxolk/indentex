@@ -393,13 +393,73 @@ mod tests {
     #[test]
     fn hashline_parser() {
         use super::hashline_parser;
-        use super::Hashline;
+        use super::Hashline::PlainLine;
+        use super::Hashline::OpenEnv;
+        use super::Environment;
 
+        // test plainlines
         assert_eq!(hashline_parser(b"# section: Test"),
-            Done(&b""[..], Hashline::PlainLine(String::from(r"\section{Test}"))));
+            Done(&b""[..], PlainLine(String::from(r"\section{Test}"))));
         assert_eq!(hashline_parser(b"# section [foo]: Test"),
-            Done(&b""[..], Hashline::PlainLine(String::from(r"\section[foo]{Test}"))));
+            Done(&b""[..], PlainLine(String::from(r"\section[foo]{Test}"))));
         assert_eq!(hashline_parser(b"# section: Test %comment"),
-            Done(&b""[..], Hashline::PlainLine(String::from(r"\section{Test} %comment"))));
+            Done(&b""[..], PlainLine(String::from(r"\section{Test} %comment"))));
+        assert_eq!(hashline_parser(b"# section [foo]: Test %comment"),
+            Done(&b""[..], PlainLine(String::from(r"\section[foo]{Test} %comment"))));
+
+        // test simple environment
+        assert_eq!(hashline_parser(b"# tikzpicture:"),
+            Done(&b""[..], OpenEnv(Environment {
+                indent_depth: 0,
+                name: String::from("tikzpicture"),
+                opts: String::from(""),
+                comment: String::from(""),
+                is_list_like: false,
+            }))
+        );
+
+        // test indent_depth
+        assert_eq!(hashline_parser(b"  # tikzpicture:"),
+            Done(&b""[..], OpenEnv(Environment {
+                indent_depth: 2,
+                name: String::from("tikzpicture"),
+                opts: String::from(""),
+                comment: String::from(""),
+                is_list_like: false,
+            }))
+        );
+
+        // test opts
+        assert_eq!(hashline_parser(b"# tikzpicture [scale=2]:"),
+            Done(&b""[..], OpenEnv(Environment {
+                indent_depth: 0,
+                name: String::from("tikzpicture"),
+                opts: String::from("[scale=2]"),
+                comment: String::from(""),
+                is_list_like: false,
+            }))
+        );
+
+        // test comment
+        assert_eq!(hashline_parser(b"# tikzpicture: % test"),
+            Done(&b""[..], OpenEnv(Environment {
+                indent_depth: 0,
+                name: String::from("tikzpicture"),
+                opts: String::from(""),
+                comment: String::from("% test"),
+                is_list_like: false,
+            }))
+        );
+
+        // test is_list_like
+        assert_eq!(hashline_parser(b"# itemize:"),
+            Done(&b""[..], OpenEnv(Environment {
+                indent_depth: 0,
+                name: String::from("itemize"),
+                opts: String::from(""),
+                comment: String::from(""),
+                is_list_like: true,
+            }))
+        );
     }
 }
