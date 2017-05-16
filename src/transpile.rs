@@ -160,7 +160,7 @@ mod tests {
     }
 
     #[test]
-    fn transpile() {
+    fn transpile_single_line_cmds() {
         use super::transpile;
 
         // Colon
@@ -196,5 +196,38 @@ mod tests {
             "\\# section\n");
         assert_eq!(transpile(&["%# section"], false),
             "%# section\n");
+    }
+
+    #[test]
+    fn transpile_list_like() {
+        use super::transpile;
+
+        // Do not convert
+        assert_eq!(transpile(&["* a"], false), "* a\n");
+        assert_eq!(transpile(&["\\* b"], false), "\\* b\n");
+        assert_eq!(transpile(&["\\\\* c"], false), "\\\\* c\n");
+
+        // itemize
+        assert_eq!(transpile(&[
+            "# itemize:",
+            "  * яблоки",
+            "  * груши",
+            "  * абрикосы",
+        ], false), "\\begin{itemize}\n  \
+            \\item яблоки\n  \
+            \\item груши\n  \
+            \\item абрикосы\n\
+            \\end{itemize}\n");
+
+        assert_eq!(transpile(&[
+            "# itemize:",
+            "  * яблоки",
+            "  * груши",
+            "  * абрикосы",
+        ], true), "\\begin{itemize}\n\
+            \\item яблоки\n\
+            \\item груши\n\
+            \\item абрикосы\n\
+            \\end{itemize}\n");
     }
 }
