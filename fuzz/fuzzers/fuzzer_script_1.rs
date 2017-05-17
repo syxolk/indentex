@@ -3,21 +3,6 @@
 extern crate indentex;
 
 fuzz_target!(|data: &[u8]| {
-    /*use std::process::Command;
-
-    use std::fs::File;
-    use std::io::{BufWriter, Write};
-
-    let path = "/tmp/test.inden.tex";
-    let file = File::create(path.as_ref())?;
-    let mut buf = BufWriter::new(file);
-    buf.write_all(data.as_ref().as_bytes())?;
-
-    Command::new("indentex")
-            .args(&[path])
-            .output()
-            .expect("failed to execute process");*/
-
     use indentex::transpile::{transpile_file, TranspileOptions};
     use indentex::file_utils::write_to_file;
 
