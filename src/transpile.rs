@@ -161,51 +161,66 @@ mod tests {
 
     #[test]
     fn transpile_single_line_cmds() {
-        use super::transpile;
+        use super::{transpile, TranspileOptions};
+
+        let options = TranspileOptions {
+            flatten_output: false,
+            prepend_do_not_edit_notice: false,
+        };
 
         // Colon
-        assert_eq!(transpile(&["# section: Foo bar"], false),
+        assert_eq!(transpile(&["# section: Foo bar"], &options),
             "\\section{Foo bar}\n");
-        assert_eq!(transpile(&["# section: Foo: bar"], false),
+        assert_eq!(transpile(&["# section: Foo: bar"], &options),
             "\\section{Foo: bar}\n");
-        assert_eq!(transpile(&["# section [Foo bar]: Foo bar"], false),
+        assert_eq!(transpile(&["# section [Foo bar]: Foo bar"], &options),
             "\\section[Foo bar]{Foo bar}\n");
-        assert_eq!(transpile(&["# section [Foo\\: bar]: Foo: bar"], false),
+        assert_eq!(transpile(&["# section [Foo\\: bar]: Foo: bar"], &options),
             "\\section[Foo: bar]{Foo: bar}\n");
 
         // Asterisk
-        assert_eq!(transpile(&["# section* : spam eggs"], false),
+        assert_eq!(transpile(&["# section* : spam eggs"], &options),
             "\\section*{spam eggs}\n");
 
         // Percent
-        assert_eq!(transpile(&["# section: foo bar % test"], false),
+        assert_eq!(transpile(&["# section: foo bar % test"], &options),
             "\\section{foo bar} % test\n");
-        assert_eq!(transpile(&["# section: \\% baz % test"], false),
+        assert_eq!(transpile(&["# section: \\% baz % test"], &options),
             "\\section{\\% baz} % test\n");
-        assert_eq!(transpile(&["# sec%tion: foo bar"], false),
+        assert_eq!(transpile(&["# sec%tion: foo bar"], &options),
             "# sec%tion: foo bar\n");
-        assert_eq!(transpile(&["# section % baz: foo bar"], false),
+        assert_eq!(transpile(&["# section % baz: foo bar"], &options),
             "# section % baz: foo bar\n");
 
         // Do not convert
-        assert_eq!(transpile(&["# section"], false),
+        assert_eq!(transpile(&["# section"], &options),
             "# section\n");
-        assert_eq!(transpile(&["#section: Foo"], false),
+        assert_eq!(transpile(&["#section: Foo"], &options),
             "#section: Foo\n");
-        assert_eq!(transpile(&["\\# section"], false),
+        assert_eq!(transpile(&["\\# section"], &options),
             "\\# section\n");
-        assert_eq!(transpile(&["%# section"], false),
+        assert_eq!(transpile(&["%# section"], &options),
             "%# section\n");
     }
 
     #[test]
     fn transpile_list_like() {
-        use super::transpile;
+        use super::{transpile, TranspileOptions};
+
+        let options = TranspileOptions {
+            flatten_output: false,
+            prepend_do_not_edit_notice: false,
+        };
+
+        let options_flatten = TranspileOptions {
+            flatten_output: true,
+            prepend_do_not_edit_notice: false,
+        };
 
         // Do not convert
-        assert_eq!(transpile(&["* a"], false), "* a\n");
-        assert_eq!(transpile(&["\\* b"], false), "\\* b\n");
-        assert_eq!(transpile(&["\\\\* c"], false), "\\\\* c\n");
+        assert_eq!(transpile(&["* a"], &options), "* a\n");
+        assert_eq!(transpile(&["\\* b"], &options), "\\* b\n");
+        assert_eq!(transpile(&["\\\\* c"], &options), "\\\\* c\n");
 
         // itemize
         assert_eq!(transpile(&[
@@ -213,7 +228,7 @@ mod tests {
             "  * яблоки",
             "  * груши",
             "  * абрикосы",
-        ], false), "\\begin{itemize}\n  \
+        ], &options), "\\begin{itemize}\n  \
             \\item яблоки\n  \
             \\item груши\n  \
             \\item абрикосы\n\
@@ -224,7 +239,7 @@ mod tests {
             "  * яблоки",
             "  * груши",
             "  * абрикосы",
-        ], true), "\\begin{itemize}\n\
+        ], &options_flatten), "\\begin{itemize}\n\
             \\item яблоки\n\
             \\item груши\n\
             \\item абрикосы\n\
