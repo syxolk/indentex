@@ -73,9 +73,8 @@ pub fn read_and_trim_lines<T: AsRef<Path>>(path: T) -> Result<Vec<String>, Inden
     buf.lines().map(|r| Ok(r?.trim_right().to_string())).collect()
 }
 
-pub fn write_to_file<T, U>(path: T, data: U) -> Result<(), IndentexError>
-    where T: AsRef<Path>,
-          U: AsRef<str>
+pub fn write_to_file<T>(path: T, data: &[u8]) -> Result<(), IndentexError>
+    where T: AsRef<Path>
 {
 
     use std::fs::File;
@@ -83,7 +82,7 @@ pub fn write_to_file<T, U>(path: T, data: U) -> Result<(), IndentexError>
 
     let file = File::create(path.as_ref())?;
     let mut buf = BufWriter::new(file);
-    buf.write_all(data.as_ref().as_bytes())?;
+    buf.write_all(data)?;
 
     Ok(())
 }

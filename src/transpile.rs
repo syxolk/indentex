@@ -116,7 +116,7 @@ pub fn transpile_file<T: AsRef<Path>>(path: T, options: &TranspileOptions) -> Re
     let lines = read_and_trim_lines(path.as_ref())?;
     let transpiled_text = transpile(&lines, options);
     let path_out = rename_indentex_file(path)?;
-    write_to_file(path_out, &transpiled_text)?;
+    write_to_file(path_out, &transpiled_text.as_bytes())?;
 
     Ok(())
 }

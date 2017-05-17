@@ -11,9 +11,9 @@ extern crate rayon;
 mod helper_parsers;
 
 mod error;
-mod file_utils;
+pub mod file_utils;
 mod parsers;
-mod transpile;
+pub mod transpile;
 
 enum ReturnCode {
     Ok = 0,
