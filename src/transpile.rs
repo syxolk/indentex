@@ -522,4 +522,48 @@ mod tests {
         \\end{b}\n\
         \\end{a}\n");
     }
+
+    #[test]
+    fn transpile_different_indents() {
+        use super::{transpile, TranspileOptions};
+
+        let options = TranspileOptions {
+            flatten_output: false,
+            prepend_do_not_edit_notice: false,
+        };
+
+        // 2 spaces
+        assert_eq!(transpile(&[
+            "# a:",
+            "  # b:",
+            "    test_b",
+            "  # c:",
+            "    test_c"
+        ], &options),
+        "\\begin{a}\n  \
+        \\begin{b}\n    \
+        test_b\n  \
+        \\end{b}\n  \
+        \\begin{c}\n    \
+        test_c\n  \
+        \\end{c}\n\
+        \\end{a}\n");
+
+        // 4 spaces
+        assert_eq!(transpile(&[
+            "# a:",
+            "    # b:",
+            "        test_b",
+            "    # c:",
+            "        test_c"
+        ], &options),
+        "\\begin{a}\n    \
+        \\begin{b}\n        \
+        test_b\n    \
+        \\end{b}\n    \
+        \\begin{c}\n        \
+        test_c\n    \
+        \\end{c}\n\
+        \\end{a}\n");
+    }
 }
