@@ -377,4 +377,149 @@ mod tests {
         \\* and this not\n\
         \\end{enumerate}\n");
     }
+
+    #[test]
+    fn transpile_envs() {
+        use super::{transpile, TranspileOptions};
+
+        let options = TranspileOptions {
+            flatten_output: false,
+            prepend_do_not_edit_notice: false,
+        };
+
+        let options_flatten = TranspileOptions {
+            flatten_output: true,
+            prepend_do_not_edit_notice: false,
+        };
+
+        // equation environment
+        assert_eq!(transpile(&[
+            "# equation*:",
+            "  # label: eq:test",
+            "  a + b",
+        ], &options),
+        "\\begin{equation*}\n  \
+        \\label{eq:test}\n  \
+        a + b\n\
+        \\end{equation*}\n");
+
+        assert_eq!(transpile(&[
+            "# equation*:",
+            "  # label: eq:test",
+            "  a + b",
+        ], &options_flatten),
+        "\\begin{equation*}\n\
+        \\label{eq:test}\n\
+        a + b\n\
+        \\end{equation*}\n");
+
+        // tikz environment
+        assert_eq!(transpile(&[
+            "# tikzpicture [x = 2 cm]:",
+            "  \\draw (0, 0) -- (1, 1);",
+        ], &options),
+        "\\begin{tikzpicture}[x = 2 cm]\n  \
+        \\draw (0, 0) -- (1, 1);\n\
+        \\end{tikzpicture}\n");
+
+        assert_eq!(transpile(&[
+            "# tikzpicture [x = 2 cm]:",
+            "  \\draw (0, 0) -- (1, 1);",
+        ], &options_flatten),
+        "\\begin{tikzpicture}[x = 2 cm]\n\
+        \\draw (0, 0) -- (1, 1);\n\
+        \\end{tikzpicture}\n");
+
+        // comments
+        assert_eq!(transpile(&[
+            "# equation: % test",
+            "  a + b",
+            "# remark [test percent escaping \\%]: % baz",
+            "  foo bar",
+        ], &options),
+        "\\begin{equation} % test\n  \
+        a + b\n\
+        \\end{equation}\n\
+        \\begin{remark}[test percent escaping \\%] % baz\n  \
+        foo bar\n\
+        \\end{remark}\n");
+
+        assert_eq!(transpile(&[
+            "# equation: % test",
+            "  a + b",
+            "# remark [test percent escaping \\%]: % baz",
+            "  foo bar",
+        ], &options_flatten),
+        "\\begin{equation} % test\n\
+        a + b\n\
+        \\end{equation}\n\
+        \\begin{remark}[test percent escaping \\%] % baz\n\
+        foo bar\n\
+        \\end{remark}\n");
+
+        // deeply nested environments
+        assert_eq!(transpile(&[
+            "# a:",
+            "  # b:",
+            "    # c:",
+            "      # d:",
+            "        # e:",
+            "          # f:",
+            "            # g:",
+            "              # h:",
+            "                # i:",
+            "                  foobar",
+        ], &options),
+        "\\begin{a}\n  \
+        \\begin{b}\n    \
+        \\begin{c}\n      \
+        \\begin{d}\n        \
+        \\begin{e}\n          \
+        \\begin{f}\n            \
+        \\begin{g}\n              \
+        \\begin{h}\n                \
+        \\begin{i}\n                  \
+        foobar\n                \
+        \\end{i}\n              \
+        \\end{h}\n            \
+        \\end{g}\n          \
+        \\end{f}\n        \
+        \\end{e}\n      \
+        \\end{d}\n    \
+        \\end{c}\n  \
+        \\end{b}\n\
+        \\end{a}\n");
+
+        assert_eq!(transpile(&[
+            "# a:",
+            "  # b:",
+            "    # c:",
+            "      # d:",
+            "        # e:",
+            "          # f:",
+            "            # g:",
+            "              # h:",
+            "                # i:",
+            "                  foobar",
+        ], &options_flatten),
+        "\\begin{a}\n\
+        \\begin{b}\n\
+        \\begin{c}\n\
+        \\begin{d}\n\
+        \\begin{e}\n\
+        \\begin{f}\n\
+        \\begin{g}\n\
+        \\begin{h}\n\
+        \\begin{i}\n\
+        foobar\n\
+        \\end{i}\n\
+        \\end{h}\n\
+        \\end{g}\n\
+        \\end{f}\n\
+        \\end{e}\n\
+        \\end{d}\n\
+        \\end{c}\n\
+        \\end{b}\n\
+        \\end{a}\n");
+    }
 }
