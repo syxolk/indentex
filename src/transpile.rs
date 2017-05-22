@@ -532,6 +532,23 @@ mod tests {
             prepend_do_not_edit_notice: false,
         };
 
+        // 1 space
+        assert_eq!(transpile(&[
+            "# a:",
+            " # b:",
+            "  test_b",
+            " # c:",
+            "  test_c"
+        ], &options),
+        "\\begin{a}\n \
+        \\begin{b}\n  \
+        test_b\n \
+        \\end{b}\n \
+        \\begin{c}\n  \
+        test_c\n \
+        \\end{c}\n\
+        \\end{a}\n");
+
         // 2 spaces
         assert_eq!(transpile(&[
             "# a:",
